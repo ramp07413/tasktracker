@@ -4,8 +4,9 @@ import { useAppContext } from '@/hooks/use-app-context';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { CheckCircle, GitCommit, Milestone } from 'lucide-react';
-import { format, differenceInDays, addDays } from 'date-fns';
+import { format } from 'date-fns';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
 
 export default function UserStatusPage() {
     const { userId } = useParams();
@@ -21,7 +22,8 @@ export default function UserStatusPage() {
     }
     const today = new Date();
     const days = Array.from({ length: 180 }).map((_, i) => {
-        const date = addDays(today, -179 + i);
+        const date = new Date(today);
+        date.setDate(today.getDate() - (179 - i));
         return format(date, 'yyyy-MM-dd');
     });
 
@@ -37,15 +39,15 @@ export default function UserStatusPage() {
         return <div className="text-center py-10">User not found.</div>;
     }
 
-    const sortedTasks = [...userTasks].sort((a, b) => new Date(b.dueDate).getTime() - new Date(a.dueDate).getTime());
+    const sortedTasks = [...userTasks].sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
 
     return (
         <div className="container py-8">
-            <header className="flex items-center gap-4 mb-8">
+            <header className="flex flex-col sm:flex-row items-center gap-4 mb-8">
                 <Avatar className="h-20 w-20 text-3xl">
                     <AvatarFallback>{user.email[0].toUpperCase()}</AvatarFallback>
                 </Avatar>
-                <div>
+                <div className="text-center sm:text-left">
                     <h1 className="text-3xl font-bold">{user.email}</h1>
                     <p className="text-muted-foreground">Public Activity</p>
                 </div>
@@ -57,9 +59,9 @@ export default function UserStatusPage() {
                         <CardHeader>
                             <CardTitle>Contribution Graph</CardTitle>
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className="overflow-x-auto pb-4">
                             <TooltipProvider>
-                                <div className="grid grid-rows-7 grid-flow-col gap-1">
+                                <div className="grid grid-rows-7 grid-flow-col gap-1 min-w-[600px]">
                                     {days.map(day => {
                                         const count = contributions.get(day) || 0;
                                         return (
@@ -83,25 +85,26 @@ export default function UserStatusPage() {
                             <CardTitle className="flex items-center gap-2"><Milestone /> Completed Task Milestones</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <ul className="space-y-6">
-                                {sortedTasks.map(task => (
-                                    <li key={task.id} className="flex items-start gap-4">
-                                        <div className="flex flex-col items-center">
-                                            <div className="bg-primary text-primary-foreground rounded-full h-8 w-8 flex items-center justify-center">
-                                                <GitCommit className="h-5 w-5" />
+                            <div className="relative">
+                                <div className="absolute left-1/2 top-0 h-full w-px bg-border -translate-x-1/2"></div>
+                                <ul className="space-y-2">
+                                    {sortedTasks.map((task, index) => (
+                                        <li key={task.id} className="flex items-center w-full group animate-fade-in-up" style={{ animationDelay: `${index * 100}ms` }}>
+                                            <div className={cn("w-1/2 flex", index % 2 === 0 ? "justify-end pr-8" : "justify-start pl-8 order-3")}>
+                                                <div className="p-4 bg-card border rounded-lg shadow-sm w-full transition-transform duration-300 group-hover:scale-105">
+                                                    <p className="font-semibold">{task.name}</p>
+                                                    <p className="text-xs text-muted-foreground mt-1">
+                                                        {format(new Date(task.dueDate), 'MMM d, yyyy')}
+                                                    </p>
+                                                </div>
                                             </div>
-                                            <div className="w-px h-full bg-border mt-2"></div>
-                                        </div>
-                                        <div>
-                                            <p className="font-semibold">{task.name}</p>
-                                            <p className="text-sm text-muted-foreground">{task.description}</p>
-                                            <p className="text-xs text-muted-foreground mt-1">
-                                                Completed on {format(new Date(task.dueDate), 'MMMM d, yyyy')}
-                                            </p>
-                                        </div>
-                                    </li>
-                                ))}
-                            </ul>
+                                            <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center z-10 flex-shrink-0 order-2">
+                                                <div className="w-3 h-3 bg-primary-foreground rounded-full animate-pulse"></div>
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
                         </CardContent>
                     </Card>
                 </div>
