@@ -94,15 +94,14 @@ export default function UserStatusPage() {
                         <CardContent>
                             <div className="relative w-full py-10">
                                 {/* Central Timeline */}
-                                <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-border rounded-full">
+                                <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-border rounded-full -translate-x-1/2">
                                      <div className="bg-primary rounded-full" style={{ height: `${progressPercentage}%` }}></div>
                                 </div>
                                 
                                 <ul className="relative space-y-8">
                                     {completedTasks.map((task, index) => (
-                                        <li key={task.id} className="relative flex items-center justify-center">
-                                            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-primary ring-4 ring-background z-10"></div>
-                                            <div className={`w-[calc(50%-2rem)] ${index % 2 === 0 ? 'order-1 text-right' : 'order-3 text-left'}`}>
+                                        <li key={task.id} className="relative flex items-center justify-between w-full">
+                                            <div className={`w-[calc(50%-2rem)] ${index % 2 === 0 ? 'text-right' : 'order-3 text-left'}`}>
                                                 <div className="inline-block p-4 bg-card border rounded-lg shadow-sm max-w-sm text-left">
                                                     <p className="font-semibold">{task.name}</p>
                                                     <p className="text-xs text-muted-foreground mt-1">
@@ -110,13 +109,13 @@ export default function UserStatusPage() {
                                                     </p>
                                                 </div>
                                             </div>
-                                            <div className="w-16 h-px bg-border order-2"></div>
+                                            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-primary ring-4 ring-background z-10"></div>
+                                            <div className={`w-16 h-px bg-border ${index % 2 === 0 ? '' : 'order-2'}`}></div>
                                         </li>
                                     ))}
                                      {nextTodoTask && (
-                                        <li className="relative flex items-center justify-center">
-                                            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-muted-foreground ring-4 ring-background z-10 animate-pulse"></div>
-                                            <div className={`w-[calc(50%-2rem)] ${completedTasks.length % 2 === 0 ? 'order-1 text-right' : 'order-3 text-left'}`}>
+                                        <li className="relative flex items-center justify-between w-full">
+                                            <div className={`w-[calc(50%-2rem)] ${completedTasks.length % 2 === 0 ? 'text-right' : 'order-3 text-left'}`}>
                                                  <div className="inline-block p-4 bg-card border border-dashed rounded-lg max-w-sm text-left">
                                                     <p className="font-semibold text-muted-foreground flex items-center gap-2">
                                                         <Rocket className="h-4 w-4"/>
@@ -127,7 +126,8 @@ export default function UserStatusPage() {
                                                     </p>
                                                 </div>
                                             </div>
-                                            <div className="w-16 h-px bg-border order-2"></div>
+                                            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-muted-foreground ring-4 ring-background z-10 animate-pulse"></div>
+                                            <div className={`w-16 h-px bg-border ${completedTasks.length % 2 === 0 ? '' : 'order-2'}`}></div>
                                         </li>
                                     )}
                                 </ul>
@@ -161,4 +161,3 @@ export default function UserStatusPage() {
         </div>
     );
 }
-
