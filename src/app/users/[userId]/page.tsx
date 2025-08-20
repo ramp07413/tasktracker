@@ -1,3 +1,4 @@
+
 "use client";
 import { useParams } from 'next/navigation';
 import { useAppContext } from '@/hooks/use-app-context';
@@ -93,7 +94,7 @@ export default function UserStatusPage() {
                         <CardContent>
                             <div className="relative w-full py-10">
                                 {/* Central Timeline */}
-                                <div className="absolute left-1/2 top-0 h-full w-1 bg-border rounded-full">
+                                <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-border rounded-full">
                                      <div className="bg-primary rounded-full" style={{ height: `${progressPercentage}%` }}></div>
                                 </div>
                                 
@@ -160,3 +161,4 @@ export default function UserStatusPage() {
         </div>
     );
 }
+
