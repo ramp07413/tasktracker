@@ -3,20 +3,23 @@ import { useParams } from 'next/navigation';
 import { useAppContext } from '@/hooks/use-app-context';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { CheckCircle, GitCommit, Milestone } from 'lucide-react';
+import { CheckCircle, GitCommit, Milestone, Rocket } from 'lucide-react';
 import { format } from 'date-fns';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
+import { Progress } from '@/components/ui/progress';
 
 export default function UserStatusPage() {
     const { userId } = useParams();
     const { users, tasks } = useAppContext();
 
     const user = users.find(u => u.id === userId);
-    const userTasks = tasks.filter(t => t.userId === userId && t.status === 'done');
-
+    const userTasks = tasks.filter(t => t.userId === userId);
+    const completedTasks = userTasks.filter(t => t.status === 'done').sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
+    const nextTodoTask = userTasks.filter(t => t.status === 'todo').sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())[0];
+    
     const contributions = new Map<string, number>();
-    for (const task of userTasks) {
+    for (const task of completedTasks) {
         const date = format(new Date(task.dueDate), 'yyyy-MM-dd');
         contributions.set(date, (contributions.get(date) || 0) + 1);
     }
@@ -39,7 +42,8 @@ export default function UserStatusPage() {
         return <div className="text-center py-10">User not found.</div>;
     }
 
-    const sortedTasks = [...userTasks].sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
+    const totalMilestones = completedTasks.length + (nextTodoTask ? 1 : 0);
+    const progressPercentage = totalMilestones > 0 ? (completedTasks.length / totalMilestones) * 100 : 0;
 
     return (
         <div className="container py-8">
@@ -82,27 +86,45 @@ export default function UserStatusPage() {
 
                     <Card className="mt-8">
                         <CardHeader>
-                            <CardTitle className="flex items-center gap-2"><Milestone /> Completed Task Milestones</CardTitle>
+                            <CardTitle className="flex items-center gap-2"><Milestone /> Task Milestones</CardTitle>
+                             {nextTodoTask && (
+                                <>
+                                <CardDescription>Progress towards your next milestone.</CardDescription>
+                                <Progress value={progressPercentage} className="w-full h-2" />
+                                </>
+                            )}
                         </CardHeader>
                         <CardContent>
-                            <div className="relative">
-                                <div className="absolute left-1/2 top-0 h-full w-px bg-border -translate-x-1/2"></div>
-                                <ul className="space-y-2">
-                                    {sortedTasks.map((task, index) => (
-                                        <li key={task.id} className="flex items-center w-full group animate-fade-in-up" style={{ animationDelay: `${index * 100}ms` }}>
-                                            <div className={cn("w-1/2 flex", index % 2 === 0 ? "justify-end pr-8" : "justify-start pl-8 order-3")}>
-                                                <div className="p-4 bg-card border rounded-lg shadow-sm w-full transition-transform duration-300 group-hover:scale-105">
-                                                    <p className="font-semibold">{task.name}</p>
-                                                    <p className="text-xs text-muted-foreground mt-1">
-                                                        {format(new Date(task.dueDate), 'MMM d, yyyy')}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center z-10 flex-shrink-0 order-2">
-                                                <div className="w-3 h-3 bg-primary-foreground rounded-full animate-pulse"></div>
+                            <div className="relative pl-6">
+                                <div className="absolute left-6 top-0 h-full w-px bg-border -translate-x-1/2"></div>
+                                <ul className="space-y-8">
+                                    {completedTasks.map((task, index) => (
+                                        <li key={task.id} className="relative flex items-center group">
+                                            <div className="absolute left-0 -translate-x-1/2 -translate-y-1/2 top-1/2 w-4 h-4 rounded-full bg-primary ring-4 ring-background z-10"></div>
+                                            <div className="w-8 h-px bg-border"></div>
+                                            <div className="p-4 bg-card border rounded-lg shadow-sm w-full transition-transform duration-300 group-hover:scale-105">
+                                                <p className="font-semibold">{task.name}</p>
+                                                <p className="text-xs text-muted-foreground mt-1">
+                                                    Completed: {format(new Date(task.dueDate), 'MMM d, yyyy')}
+                                                </p>
                                             </div>
                                         </li>
                                     ))}
+                                     {nextTodoTask && (
+                                        <li className="relative flex items-center group">
+                                            <div className="absolute left-0 -translate-x-1/2 -translate-y-1/2 top-1/2 w-4 h-4 rounded-full bg-muted-foreground ring-4 ring-background z-10 animate-pulse"></div>
+                                            <div className="w-8 h-px bg-border"></div>
+                                            <div className="p-4 bg-card border border-dashed rounded-lg w-full">
+                                                <p className="font-semibold text-muted-foreground flex items-center gap-2">
+                                                    <Rocket className="h-4 w-4"/>
+                                                    Next Milestone: {nextTodoTask.name}
+                                                </p>
+                                                <p className="text-xs text-muted-foreground mt-1">
+                                                    Due: {format(new Date(nextTodoTask.dueDate), 'MMM d, yyyy')}
+                                                </p>
+                                            </div>
+                                        </li>
+                                    )}
                                 </ul>
                             </div>
                         </CardContent>
@@ -117,7 +139,7 @@ export default function UserStatusPage() {
                         <CardContent className="space-y-4">
                             <div className="flex items-center justify-between">
                                 <span className="text-muted-foreground">Total Completed</span>
-                                <span className="font-bold">{userTasks.length}</span>
+                                <span className="font-bold">{completedTasks.length}</span>
                             </div>
                             <div className="flex items-center justify-between">
                                 <span className="text-muted-foreground">Coins Earned</span>
