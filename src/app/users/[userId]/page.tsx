@@ -3,10 +3,9 @@ import { useParams } from 'next/navigation';
 import { useAppContext } from '@/hooks/use-app-context';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { CheckCircle, GitCommit, Milestone, Rocket } from 'lucide-react';
+import { Milestone, Rocket } from 'lucide-react';
 import { format } from 'date-fns';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
 
 export default function UserStatusPage() {
@@ -24,9 +23,9 @@ export default function UserStatusPage() {
         contributions.set(date, (contributions.get(date) || 0) + 1);
     }
     const today = new Date();
-    const days = Array.from({ length: 180 }).map((_, i) => {
+    const days = Array.from({ length: 30 }).map((_, i) => {
         const date = new Date(today);
-        date.setDate(today.getDate() - (179 - i));
+        date.setDate(today.getDate() - (29 - i));
         return format(date, 'yyyy-MM-dd');
     });
 
@@ -61,17 +60,17 @@ export default function UserStatusPage() {
                 <div className="lg:col-span-2">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Contribution Graph</CardTitle>
+                            <CardTitle>Last 30 Days Contributions</CardTitle>
                         </CardHeader>
                         <CardContent className="overflow-x-auto pb-4">
                             <TooltipProvider>
-                                <div className="grid grid-rows-7 grid-flow-col gap-1 min-w-[600px]">
+                                <div className="flex gap-1">
                                     {days.map(day => {
                                         const count = contributions.get(day) || 0;
                                         return (
                                             <Tooltip key={day}>
                                                 <TooltipTrigger asChild>
-                                                    <div className={`w-3.5 h-3.5 rounded-sm ${getContributionColor(count)}`} />
+                                                    <div className={`w-4 h-4 rounded-sm ${getContributionColor(count)}`} />
                                                 </TooltipTrigger>
                                                 <TooltipContent>
                                                     <p>{count} tasks on {format(new Date(day), 'MMM d, yyyy')}</p>
@@ -88,41 +87,46 @@ export default function UserStatusPage() {
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2"><Milestone /> Task Milestones</CardTitle>
                              {nextTodoTask && (
-                                <>
                                 <CardDescription>Progress towards your next milestone.</CardDescription>
-                                <Progress value={progressPercentage} className="w-full h-2" />
-                                </>
                             )}
                         </CardHeader>
                         <CardContent>
-                            <div className="relative pl-6">
-                                <div className="absolute left-6 top-0 h-full w-px bg-border -translate-x-1/2"></div>
-                                <ul className="space-y-8">
+                            <div className="relative w-full py-10">
+                                {/* Central Timeline */}
+                                <div className="absolute left-1/2 top-0 h-full w-1 bg-border rounded-full">
+                                     <div className="bg-primary rounded-full" style={{ height: `${progressPercentage}%` }}></div>
+                                </div>
+                                
+                                <ul className="relative space-y-8">
                                     {completedTasks.map((task, index) => (
-                                        <li key={task.id} className="relative flex items-center group">
-                                            <div className="absolute left-0 -translate-x-1/2 -translate-y-1/2 top-1/2 w-4 h-4 rounded-full bg-primary ring-4 ring-background z-10"></div>
-                                            <div className="w-8 h-px bg-border"></div>
-                                            <div className="p-4 bg-card border rounded-lg shadow-sm w-full transition-transform duration-300 group-hover:scale-105">
-                                                <p className="font-semibold">{task.name}</p>
-                                                <p className="text-xs text-muted-foreground mt-1">
-                                                    Completed: {format(new Date(task.dueDate), 'MMM d, yyyy')}
-                                                </p>
+                                        <li key={task.id} className="relative flex items-center justify-center">
+                                            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-primary ring-4 ring-background z-10"></div>
+                                            <div className={`w-[calc(50%-2rem)] ${index % 2 === 0 ? 'order-1 text-right' : 'order-3 text-left'}`}>
+                                                <div className="inline-block p-4 bg-card border rounded-lg shadow-sm max-w-sm text-left">
+                                                    <p className="font-semibold">{task.name}</p>
+                                                    <p className="text-xs text-muted-foreground mt-1">
+                                                        Completed: {format(new Date(task.dueDate), 'MMM d, yyyy')}
+                                                    </p>
+                                                </div>
                                             </div>
+                                            <div className="w-16 h-px bg-border order-2"></div>
                                         </li>
                                     ))}
                                      {nextTodoTask && (
-                                        <li className="relative flex items-center group">
-                                            <div className="absolute left-0 -translate-x-1/2 -translate-y-1/2 top-1/2 w-4 h-4 rounded-full bg-muted-foreground ring-4 ring-background z-10 animate-pulse"></div>
-                                            <div className="w-8 h-px bg-border"></div>
-                                            <div className="p-4 bg-card border border-dashed rounded-lg w-full">
-                                                <p className="font-semibold text-muted-foreground flex items-center gap-2">
-                                                    <Rocket className="h-4 w-4"/>
-                                                    Next Milestone: {nextTodoTask.name}
-                                                </p>
-                                                <p className="text-xs text-muted-foreground mt-1">
-                                                    Due: {format(new Date(nextTodoTask.dueDate), 'MMM d, yyyy')}
-                                                </p>
+                                        <li className="relative flex items-center justify-center">
+                                            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-muted-foreground ring-4 ring-background z-10 animate-pulse"></div>
+                                            <div className={`w-[calc(50%-2rem)] ${completedTasks.length % 2 === 0 ? 'order-1 text-right' : 'order-3 text-left'}`}>
+                                                 <div className="inline-block p-4 bg-card border border-dashed rounded-lg max-w-sm text-left">
+                                                    <p className="font-semibold text-muted-foreground flex items-center gap-2">
+                                                        <Rocket className="h-4 w-4"/>
+                                                        Next Milestone: {nextTodoTask.name}
+                                                    </p>
+                                                    <p className="text-xs text-muted-foreground mt-1">
+                                                        Due: {format(new Date(nextTodoTask.dueDate), 'MMM d, yyyy')}
+                                                    </p>
+                                                </div>
                                             </div>
+                                            <div className="w-16 h-px bg-border order-2"></div>
                                         </li>
                                     )}
                                 </ul>
@@ -144,6 +148,10 @@ export default function UserStatusPage() {
                             <div className="flex items-center justify-between">
                                 <span className="text-muted-foreground">Coins Earned</span>
                                 <span className="font-bold">{user.coins}</span>
+                            </div>
+                             <div className="space-y-2">
+                                <span className="text-muted-foreground text-sm">Milestone Progress</span>
+                                <Progress value={progressPercentage} className="w-full h-2" />
                             </div>
                         </CardContent>
                     </Card>
