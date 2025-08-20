@@ -101,7 +101,8 @@ export default function UserStatusPage() {
                                 <ul className="relative space-y-8">
                                     {completedTasks.map((task, index) => (
                                         <li key={task.id} className="relative flex items-center justify-between w-full">
-                                            <div className={`w-[calc(50%-2rem)] ${index % 2 === 0 ? 'text-right' : 'order-3 text-left'}`}>
+                                            {/* Task Card */}
+                                            <div className={`w-[calc(50%-2.5rem)] ${index % 2 === 0 ? 'text-right' : 'order-3 text-left'}`}>
                                                 <div className="inline-block p-4 bg-card border rounded-lg shadow-sm max-w-sm text-left">
                                                     <p className="font-semibold">{task.name}</p>
                                                     <p className="text-xs text-muted-foreground mt-1">
@@ -109,13 +110,16 @@ export default function UserStatusPage() {
                                                     </p>
                                                 </div>
                                             </div>
+                                            {/* Milestone Dot */}
                                             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-primary ring-4 ring-background z-10"></div>
-                                            <div className={`w-16 h-px bg-border ${index % 2 === 0 ? '' : 'order-2'}`}></div>
+                                            {/* Connecting Line */}
+                                            <div className={`w-8 h-px bg-border ${index % 2 === 0 ? '' : 'order-2'}`}></div>
                                         </li>
                                     ))}
                                      {nextTodoTask && (
                                         <li className="relative flex items-center justify-between w-full">
-                                            <div className={`w-[calc(50%-2rem)] ${completedTasks.length % 2 === 0 ? 'text-right' : 'order-3 text-left'}`}>
+                                             {/* Next Milestone Card */}
+                                            <div className={`w-[calc(50%-2.5rem)] ${completedTasks.length % 2 === 0 ? 'text-right' : 'order-3 text-left'}`}>
                                                  <div className="inline-block p-4 bg-card border border-dashed rounded-lg max-w-sm text-left">
                                                     <p className="font-semibold text-muted-foreground flex items-center gap-2">
                                                         <Rocket className="h-4 w-4"/>
@@ -126,8 +130,10 @@ export default function UserStatusPage() {
                                                     </p>
                                                 </div>
                                             </div>
+                                            {/* Milestone Dot */}
                                             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-muted-foreground ring-4 ring-background z-10 animate-pulse"></div>
-                                            <div className={`w-16 h-px bg-border ${completedTasks.length % 2 === 0 ? '' : 'order-2'}`}></div>
+                                             {/* Connecting Line */}
+                                            <div className={`w-8 h-px bg-border ${completedTasks.length % 2 === 0 ? '' : 'order-2'}`}></div>
                                         </li>
                                     )}
                                 </ul>
