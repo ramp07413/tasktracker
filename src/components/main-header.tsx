@@ -77,6 +77,10 @@ export function MainHeader() {
                 <LayoutDashboard className="mr-2 h-4 w-4" />
                 <span>Dashboard</span>
               </DropdownMenuItem>
+               <DropdownMenuItem onClick={() => router.push(`/users/${user?.id}`)}>
+                <UserIcon className="mr-2 h-4 w-4" />
+                <span>Public Profile</span>
+              </DropdownMenuItem>
               {user?.isAdmin && (
                  <DropdownMenuItem onClick={() => router.push('/admin')}>
                   <Shield className="mr-2 h-4 w-4" />
