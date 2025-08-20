@@ -23,16 +23,18 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { cn } from '@/lib/utils';
 
 interface TaskCardProps {
   task: Task;
 }
 
 const statusStyles: Record<TaskStatus, string> = {
-    todo: 'bg-red-100 text-red-800',
-    'in-progress': 'bg-yellow-100 text-yellow-800',
-    done: 'bg-green-100 text-green-800',
+  todo: 'bg-destructive/10 text-destructive',
+  'in-progress': 'bg-yellow-500/10 text-yellow-600',
+  done: 'bg-primary/10 text-primary',
 };
+
 
 export function TaskCard({ task }: TaskCardProps) {
   const { deleteTask, updateTaskStatus } = useAppContext();
@@ -42,7 +44,10 @@ export function TaskCard({ task }: TaskCardProps) {
       <CardHeader>
         <div className="flex justify-between items-start">
             <CardTitle className="text-lg">{task.name}</CardTitle>
-            <span className={`px-2 py-1 text-xs font-semibold rounded-full ${statusStyles[task.status]}`}>
+            <span className={cn(
+              'px-2 py-1 text-xs font-semibold rounded-full capitalize',
+              statusStyles[task.status]
+            )}>
                 {task.status.replace('-', ' ')}
             </span>
         </div>

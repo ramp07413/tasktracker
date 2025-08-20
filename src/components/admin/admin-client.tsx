@@ -2,12 +2,13 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useAppContext } from '@/hooks/use-app-context';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Trash2, Shield, Users, Palette } from 'lucide-react';
+import { Trash2, Shield, Users, Palette, ExternalLink } from 'lucide-react';
 import { themes } from '@/lib/themes';
 
 export function AdminClient() {
@@ -51,6 +52,7 @@ export function AdminClient() {
                 <TableHead>Email</TableHead>
                 <TableHead>Role</TableHead>
                 <TableHead>Coins</TableHead>
+                <TableHead>Public Profile</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -64,6 +66,13 @@ export function AdminClient() {
                     </Badge>
                   </TableCell>
                   <TableCell>{u.coins}</TableCell>
+                  <TableCell>
+                    <Button variant="outline" size="sm" asChild>
+                      <Link href={`/users/${u.id}`}>
+                        View <ExternalLink className="ml-2 h-4 w-4" />
+                      </Link>
+                    </Button>
+                  </TableCell>
                   <TableCell className="text-right">
                     <Button variant="outline" size="sm" onClick={() => toggleAdmin(u.id)} disabled={u.id === user.id}>
                         <Shield className="mr-2 h-4 w-4"/>
