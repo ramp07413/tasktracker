@@ -15,6 +15,7 @@ export default function UserStatusPage() {
     const { users, tasks } = useAppContext();
 
     const user = users.find(u => u.id === userId);
+    
     const userTasks = tasks.filter(t => t.userId === userId).sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
     
     const completedTasks = userTasks.filter(t => t.status === 'done');
